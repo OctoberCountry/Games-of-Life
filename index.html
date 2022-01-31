@@ -10,26 +10,49 @@
 </head>
 
 <body>
-    <h1>John Conway's Game of Life</h1>
+    <h1>Games of Life</h1>
     <div class="canvas"></div>
     <h2>Generations: <span id="GenerationsDisplay">1</span></h2>
-    <button class="start">Start/Stop</button>
-    <label for="speed">Choose a speed:</label>
 
-    <select name="speed" id="speed">
-        <option value="10">10 ms</option>
-        <option value="50">50 ms</option>
-        <option value="100" selected>100 ms</option>
-        <option value="250">250 ms</option>
-        <option value="500">500 ms</option>
-    </select>
+    <div>
+        <button class="start">Start/Stop</button>
 
-    <label for="pattern">Choose a pattern:</label>
-    <select name="pattern" id="pattern">
-        <option value="gosperGliderGun">Gosper Glider Gun</option>
-        <option value="acorn">Acorn</option>
-        <option value="rPentomino">R-Pentomino</option>
-    </select>
+        <button class="GolButton">Game of Life</button>
+        <button class="SeedsButton">Seeds</button>
+        <button class="LwdButton">Life without Death</button>
+        <p>Or make your own rule: Birth count is the number of live neighbors required for a cell to be birthed.</p>
+        <p>Survival is the number of live neighbors required for a live cell to survive.</p>
+        <input type="text" id="birthValue">Birth</input>
+        <input type="text" id="survivalValue">Survival</input>
+        <button class="customButton">Run custom rule</button>
+    </div>
+
+    <div>
+        <label for="cellSize">Choose a cell size:</label>
+        <select name="cellSize" id="cellSize">
+            <option value="2">2 px</option>
+            <option value="5">5 px</option>
+            <option value="10">10 px</option>
+            <option value="25">25 px</option>
+            <option value="50">50 px</option>
+        </select>
+
+        <label for="speed">Choose a speed:</label>
+        <select name="speed" id="speed">
+            <option value="10">10 ms</option>
+            <option value="50">50 ms</option>
+            <option value="100" selected>100 ms</option>
+            <option value="250">250 ms</option>
+            <option value="500">500 ms</option>
+        </select>
+
+        <label for="pattern">Choose a pattern:</label>
+        <select name="pattern" id="pattern">
+            <option value="gosperGliderGun">Gosper Glider Gun</option>
+            <option value="acorn">Acorn</option>
+            <option value="rPentomino">R-Pentomino</option>
+        </select>
+    </div>
     <button id="reset">Reset</button>
     <script src="script.js"></script>
 </body>
