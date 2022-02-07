@@ -1,10 +1,8 @@
 // John Conway's Game of Life
 
 //To do:
-// Create dropdown tables in HTML to dynamically select different patterns, board sizes and generation speeds.
 // Set the canvas size in Javascript instead of HTML
 // Create a function/program to get a list of coordinates/color values from a pixel image. Use ctx.getImageData
-
 
 // Get coordinates.
 // Pass x and y into a function that gets and changes the board and redraws it.
@@ -12,11 +10,10 @@
 //Allow users to upload text files that are parsed as patterns.
 //Add more predefined patterns - spaceships etc.
 
-
 //Create the canvas
 let cellSize = 5;
-const rows = 100
-const cols = 200
+let rows = 100
+let cols = 200
 
 const canvasContainer = document.querySelector(".canvas")
 const canvas = document.createElement("canvas")
@@ -30,6 +27,10 @@ const canvasRect = canvas.getBoundingClientRect()
 let activeRule = "Game of Life"
 let isDrawing = false
 
+let board = []
+let active = false
+let density = 0.5
+
 canvas.addEventListener("mousedown", function () {
     isDrawing = true
 })
@@ -41,42 +42,76 @@ canvas.addEventListener("mousemove", placeCell)
 
 //Set the buttons to control the speed and patterns
 
+let birthDisplay = document.querySelector("#birthValue")
+let survivalDisplay = document.querySelector("#survivalValue")
+
 let GolDisplay = document.querySelector(".GolButton")
 GolDisplay.addEventListener("click", function () {
-    activeRule = "Game of Life"
+    birthDisplay.value = "3"
+    survivalDisplay.value = "23"
 })
 
 let SeedsDisplay = document.querySelector(".SeedsButton")
 SeedsDisplay.addEventListener("click", function () {
-    activeRule = "Seeds"
+    //activeRule = "Seeds"
+    birthDisplay.value = "2"
+    survivalDisplay.value = ""
 })
 let LwdDisplay = document.querySelector(".LwdButton")
 LwdDisplay.addEventListener("click", function () {
-    activeRule = "Life without Death"
+    //activeRule = [[3], [0, 1, 2, 3, 4, 5, 6, 7, 8]]
+    birthDisplay.value = "3"
+    survivalDisplay.value = "012345678"
 })
 
-let customDisplay = document.querySelector(".customButton")
-customDisplay.addEventListener("click", function () {
-    activeRule = "Custom"
+let DiamoebaDisplay = document.querySelector(".DiamoebaButton")
+DiamoebaDisplay.addEventListener("click", function () {
+    birthDisplay.value = "35678"
+    survivalDisplay.value = "5678"
 })
 
-let birthDisplay = document.querySelector("#birthValue")
-let survivalDisplay = document.querySelector("#survivalValue")
+let AnnealDisplay = document.querySelector(".AnnealButton")
+AnnealDisplay.addEventListener("click", function () {
+    birthDisplay.value = "4678"
+    survivalDisplay.value = "35678"
+})
+
+let DayAndNightDisplay = document.querySelector(".DayAndNightButton")
+DayAndNightDisplay.addEventListener("click", function () {
+    birthDisplay.value = "3678"
+    survivalDisplay.value = "34678"
+})
 
 const generationsDisplay = document.querySelector("#GenerationsDisplay")
 let generationsCount = 0
 
 let speed = 100
 let speedDisplay = document.querySelector("#speed")
-speedDisplay.addEventListener("change", function () {
-    speed = speedDisplay.value
-})
+speedDisplay.oninput = function () {
+    speed = parseInt(speedDisplay.value)
+}
+// speedDisplay.addEventListener("change", function () {
+//     speed = speedDisplay.value
+// })
 
 let cellSizeDisplay = document.querySelector("#cellSize")
-cellSizeDisplay.addEventListener("change", function () {
-    cellSize = cellSizeDisplay.value
+cellSizeDisplay.oninput = function () {
+    if (active) {
+        return
+    }
+    cellSize = parseInt(cellSizeDisplay.value)
+    cols = canvas.width / cellSize
+    rows = canvas.height / cellSize
+    createBoard(density)
     drawBoard()
-})
+}
+
+let densityDisplay = document.querySelector("#density")
+densityDisplay.oninput = function () {
+    density = parseFloat(densityDisplay.value)
+    createBoard(density)
+    drawBoard()
+}
 
 let patternDisplay = document.querySelector("#pattern")
 patternDisplay.addEventListener("input", function () {
@@ -91,24 +126,21 @@ patternDisplay.addEventListener("input", function () {
     }
 })
 
-let board = []
-
-const startButton = document.querySelector(".start")
-let active = false
-
+const startButton = document.querySelector(".startButton")
 startButton.addEventListener("click", function () {
     start()
 })
 
-const resetButton = document.querySelector("#reset")
-resetButton.addEventListener("click", function () {
-    board = []
-    for (let i = 0; i < rows; i++) {
-        board.push([])
-        for (let j = 0; j < cols; j++) {
-            board[i].push(0)
-        }
-    }
+const pauseButton = document.querySelector(".pauseButton")
+pauseButton.addEventListener("click", function () {
+    pause()
+})
+
+const stopButton = document.querySelector(".stopButton")
+stopButton.addEventListener("click", function () {
+    pause()
+    generationsCount = 0
+    createRandomBoard(0)
     drawBoard()
 })
 
@@ -127,19 +159,24 @@ function drawCell(color, x, y) {
 }
 
 //Create the 2D array for the board
-function createBoard() {
+function createBoard(density) {
+    board = []
     for (let i = 0; i < rows; i++) {
         board.push([])
         for (let j = 0; j < cols; j++) {
-            let num = Math.floor(Math.random() * 2)
-            board[i].push(num)
+            if (Math.random() < density) {
+                board[i].push(1)
+            }
+            else {
+                board[i].push(0)
+            }
         }
     }
 }
 
 //Draw the cells on the canvas according to their value in the array, 0 or 1, dead or alive
 function drawBoard() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             if (board[i][j] === 0) {
@@ -155,13 +192,39 @@ function drawBoard() {
     generationsDisplay.innerText = generationsCount
 }
 
-function generateCustom() {
+function generate(notation) {
     console.log("custom")
     let nextBoard = []
+    for (let i = 0; i < rows; i++) {
+        nextBoard.push([])
+        for (let j = 0; j < cols; j++) {
+            let neighbors = countNeighbors(board, i, j)
+            let state = board[i][j];
+            //Calculating which cells are birthed from death
+            if (state === 0 && notation[0].includes(neighbors)) {
+                nextBoard[i].push(1)
+            }
+            //Calculating which cells survive from life
+            else if (state === 1 && notation[1].includes(neighbors)) {
+                nextBoard[i].push(1)
+            }
+            //All other cells die off
+            else {
+                nextBoard[i].push(0)
+            }
+        }
+    }
+    //Updating the board and generations count
+    board = nextBoard
+    generationsCount++
+    drawBoard()
 
+}
+
+function generateCustom() {
+    let nextBoard = []
     let birthNums = birthDisplay.value.split("").map(x => parseInt(x))
     let survivalNums = survivalDisplay.value.split("").map(x => parseInt(x))
-
     for (let i = 0; i < rows; i++) {
         nextBoard.push([])
         for (let j = 0; j < cols; j++) {
@@ -185,84 +248,6 @@ function generateCustom() {
     board = nextBoard
     generationsCount++
     drawBoard()
-
-}
-
-//The original Game of Life rules. B3S23
-function generateGol() {
-    let nextBoard = []
-
-    for (let i = 0; i < rows; i++) {
-        nextBoard.push([])
-        for (let j = 0; j < cols; j++) {
-            let neighbors = countNeighbors(board, i, j)
-            let state = board[i][j];
-            if (state === 0 && neighbors === 3) {
-                nextBoard[i].push(1)
-            }
-            else if (state === 1 && (neighbors < 2 || neighbors > 3)) {
-                nextBoard[i].push(0)
-
-            }
-            else {
-                nextBoard[i].push(board[i][j])
-            }
-        }
-    }
-    board = nextBoard
-
-    generationsCount++
-    drawBoard()
-
-}
-//The Life without Death rule. Notation: B3/S012345678
-function generateLwd() {
-    console.log("Life without death")
-    let nextBoard = []
-
-    for (let i = 0; i < rows; i++) {
-        nextBoard.push([])
-        for (let j = 0; j < cols; j++) {
-            let neighbors = countNeighbors(board, i, j)
-            let state = board[i][j];
-            if (neighbors === 3) {
-                nextBoard[i].push(1)
-            }
-            // else if (state === 1 && (neighbors < 2 || neighbors > 3)) {
-            //     nextBoard[i].push(0)
-
-            // }
-            else {
-                nextBoard[i].push(board[i][j])
-            }
-        }
-    }
-    board = nextBoard
-
-    generationsCount++
-    drawBoard()
-
-}
-
-function generateSeeds() {
-    let newBoard = []
-    for (let i = 0; i < rows; i++) {
-        newBoard.push([])
-        for (let j = 0; j < cols; j++) {
-            if (countNeighbors(board, i, j) === 2) {
-                newBoard[i].push(1)
-                drawCell("black", j, i)
-            }
-            else {
-                newBoard[i].push(0)
-                drawCell("white", j, i)
-            }
-
-        }
-    }
-    board = newBoard
-    generationsCount++
-    //drawBoard()
 }
 
 // Count the neighbors
@@ -299,30 +284,20 @@ function countNeighbors(grid, x, y) {
 let startFunction
 function start() {
     if (active) {
-        clearInterval(startFunction)
-        active = false
+        // clearInterval(startFunction)
+        // active = false
     }
     else {
-
-        if (activeRule === "Game of Life") {
-            startFunction = setInterval(generateGol,
-                speed)
-        }
-        else if (activeRule === "Seeds") {
-            startFunction = setInterval(generateSeeds,
-                speed)
-        }
-        else if (activeRule === "Life without Death") {
-            startFunction = setInterval(generateLwd,
-                speed)
-        }
-        else if (activeRule === "Custom") {
-            startFunction = setInterval(generateCustom,
-                speed)
-        }
+        startFunction = setInterval(generateCustom,
+            speed)
         active = true
         return
     }
+}
+
+function pause() {
+    clearInterval(startFunction)
+    active = false
 }
 
 let acorn = centerPattern([[1, 2], [2, 4], [3, 1], [3, 2], [3, 5], [3, 6], [3, 7]])
@@ -421,5 +396,5 @@ function createPattern(list) {
 }
 
 
-createBoard()
+createBoard(0.9)
 drawBoard()

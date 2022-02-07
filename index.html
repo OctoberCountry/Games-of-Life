@@ -6,54 +6,77 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Games of Life
+    </title>
 </head>
 
 <body>
     <h1>Games of Life</h1>
-    <div class="canvas"></div>
-    <h2>Generations: <span id="GenerationsDisplay">1</span></h2>
+    <main>
 
-    <div>
-        <button class="start">Start/Stop</button>
+        <div class="sidebar">
+            <h2>Generations: <span id="GenerationsDisplay">1</span></h2>
+            <p>Explore variations of John Conway's famous Game of Life and see how the grid evolves over time.</p>
+            <div class="buttons">
+                <button class="GolButton ruleButton">Game of Life</button>
+                <button class="SeedsButton ruleButton">Seeds</button>
+                <button class="LwdButton ruleButton">Life without Death</button>
+                <button class="DiamoebaButton ruleButton">Diamoeba</button>
+                <button class="AnnealButton ruleButton">Anneal</button>
+                <button class="DayAndNightButton ruleButton">Day & Night</button>
+            </div>
+            <div>
+                <p>You can also make your own rule: Birth (B)) is the number of live neighbors required for a cell to be
+                    birthed.
+                </p>
+                <p>Survival (S) is the number of live neighbors required for a live cell to survive.</p>
+                <p>Using this notation, Conway's original rule is: B3S23</p>
 
-        <button class="GolButton">Game of Life</button>
-        <button class="SeedsButton">Seeds</button>
-        <button class="LwdButton">Life without Death</button>
-        <p>Or make your own rule: Birth count is the number of live neighbors required for a cell to be birthed.</p>
-        <p>Survival is the number of live neighbors required for a live cell to survive.</p>
-        <input type="text" id="birthValue">Birth</input>
-        <input type="text" id="survivalValue">Survival</input>
-        <button class="customButton">Run custom rule</button>
-    </div>
 
-    <div>
-        <label for="cellSize">Choose a cell size:</label>
-        <select name="cellSize" id="cellSize">
-            <option value="2">2 px</option>
-            <option value="5">5 px</option>
-            <option value="10">10 px</option>
-            <option value="25">25 px</option>
-            <option value="50">50 px</option>
-        </select>
+                <label for="birthValue">Birth:</label>
+                <input type="text" id="birthValue" value="3"></input>
+                <label for="survivalValue">Survival:</label>
+                <input type="text" id="survivalValue" value="23"></input>
 
-        <label for="speed">Choose a speed:</label>
-        <select name="speed" id="speed">
-            <option value="10">10 ms</option>
-            <option value="50">50 ms</option>
-            <option value="100" selected>100 ms</option>
-            <option value="250">250 ms</option>
-            <option value="500">500 ms</option>
-        </select>
+            </div>
+            <p>Draw cells on the grid, or play with the density to randomize the cells.</p>
+            <div>
+                <label for="cellSize">Cell size:</label>
+                <input type="range" min="5" max="25" step="5" id="cellSize">
+                <!-- <select name="cellSize" id="cellSize">
+                    <option value="2">2 px</option>
+                    <option value="5">5 px</option>
+                    <option value="10">10 px</option>
+                    <option value="25">25 px</option>
+                    <option value="50">50 px</option>
+                </select> -->
 
-        <label for="pattern">Choose a pattern:</label>
-        <select name="pattern" id="pattern">
-            <option value="gosperGliderGun">Gosper Glider Gun</option>
-            <option value="acorn">Acorn</option>
-            <option value="rPentomino">R-Pentomino</option>
-        </select>
-    </div>
-    <button id="reset">Reset</button>
+                <label for="speed">Speed:</label>
+                <input type="range" min="50" max="250" step="50" id="speed">
+                <!-- <select name="speed" id="speed">
+                    <option value="10">10 ms</option>
+                    <option value="50">50 ms</option>
+                    <option value="100" selected>100 ms</option>
+                    <option value="250">250 ms</option>
+                    <option value="500">500 ms</option>
+                </select> -->
+                <label for="density">Density:</label>
+                <input type="range" min="0" max="1" step="0.1" id="density">
+                <br>
+
+                <label for="pattern">Pattern:</label>
+                <select name="pattern" id="pattern">
+                    <option value="gosperGliderGun">Gosper Glider Gun</option>
+                    <option value="acorn">Acorn</option>
+                    <option value="rPentomino">R-Pentomino</option>
+                </select>
+            </div>
+            <button class="stopButton">Stop</button>
+            <button class="startButton">Play</button>
+            <button class="pauseButton">Pause</button>
+        </div>
+        <div class="canvas"></div>
+    </main>
     <script src="script.js"></script>
 </body>
 
